@@ -8,6 +8,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.view.ViewGroup.LayoutParams;
 import androidx.annotation.NonNull;
@@ -115,6 +116,11 @@ public class SpringActivity extends AppCompatActivity {
     }
 
     private void loadShoeData() {
+
+        // Show the progress bar while loading
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
         // Загружаем данные об обуви пользователя из Firebase Realtime Database, используя UID текущего пользователя
         String userId = currentUser.getUid();
         DatabaseReference userShoesRef = databaseReference.child("users").child(userId).child("shoes3");
@@ -128,20 +134,25 @@ public class SpringActivity extends AppCompatActivity {
                 int shoeNumber = 1; // Начальное значение нумерации
 
                 for (DataSnapshot shoeSnapshot : dataSnapshot.getChildren()) {
-                    Shoe1 shoe = shoeSnapshot.getValue(Shoe1.class);
+                    Shoe shoe = shoeSnapshot.getValue(Shoe.class);
                     if (shoe != null) {
                         String shoeKey = shoeSnapshot.getKey();
-                        String shoeInfo = "№ " + shoeNumber + " " + shoe.getShoeName();
+                        String shoeInfo = "№ " + shoeNumber + " "+ shoe.getShoeName();
                         displayShoeInfo(shoeKey, shoeInfo);
 
                         shoeNumber++; // Увеличиваем номер для следующей обуви
                     }
                 }
+
+                // Hide the progress bar when data is loaded
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 // Обработка ошибки
+                // Handle error and hide the progress bar
+                progressBar.setVisibility(View.GONE);
             }
         });
     }
